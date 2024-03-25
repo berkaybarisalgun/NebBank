@@ -29,14 +29,14 @@ public interface CustomerRepository extends JpaRepository<Customer,Long> {
      * @param firstName the first name of the customer
      * @return an optional customer
      */
-    Optional<Customer> findByFirstName(String firstName);
+    List<Customer> findByFirstName(String firstName);
 
     /**
      * Find a customer by their last name
      * @param lastName the last name of the customer
      * @return an optional customer
      */
-    Optional<Customer> findByLastName(String lastName);
+    List<Customer> findByLastName(String lastName);
 
     /**
      * Find all customers created at a specific date and time
