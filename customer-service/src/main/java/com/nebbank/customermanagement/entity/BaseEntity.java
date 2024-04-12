@@ -22,42 +22,27 @@ import java.time.LocalDateTime;
 @Data
 public class BaseEntity {
 
-    /**
-     * The date and time the entity was created.
-     */
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    /**
-     * The user who created the entity.
-     */
     @CreatedBy
     @Column(updatable = false)
     private String createdBy;
 
-    /**
-     * The date and time the entity was last modified.
-     */
+
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime updatedAt;
 
-    /**
-     * The user who last modified the entity.
-     */
     @LastModifiedBy
     @Column(insertable = false)
     private String updatedBy;
 
-    /**
-     * A flag indicating whether the entity is active.
-     */
+
     private Boolean isActive;
 
-    /**
-     * A flag indicating whether the entity is deleted.
-     */
+
     private Boolean isDeleted;
 
 }
