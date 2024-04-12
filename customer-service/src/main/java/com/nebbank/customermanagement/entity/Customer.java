@@ -1,18 +1,16 @@
 package com.nebbank.customermanagement.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Data;
+import org.modelmapper.internal.bytebuddy.dynamic.loading.InjectionClassLoader;
 
 @Entity
 @Data
 public class Customer extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id")
     private Long Id;
 
