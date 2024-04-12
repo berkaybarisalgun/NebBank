@@ -2,9 +2,7 @@ package com.nebbank.customermanagement.service;
 
 import com.nebbank.customermanagement.dto.CustomerDto;
 import com.nebbank.customermanagement.exceptions.CustomerCreationException;
-import com.nebbank.customermanagement.exceptions.CustomerDeletionException;
 import com.nebbank.customermanagement.exceptions.CustomerNotFoundException;
-import com.nebbank.customermanagement.exceptions.CustomerUpdateException;
 
 public interface CustomerService {
 
@@ -12,9 +10,9 @@ public interface CustomerService {
 
     CustomerDto findCustomerByAttribute(String attributeType, String attributeValue) throws CustomerNotFoundException;
 
-    void updateCustomer(CustomerDto customerDto) throws CustomerUpdateException;
+    Boolean updateCustomer(CustomerDto customerDto) throws CustomerNotFoundException;
 
-    void deleteCustomerByAttribute(String attributeType, String attributeValue) throws CustomerDeletionException;
+    void deleteCustomerByAttribute(String attributeType, String attributeValue) throws CustomerNotFoundException;
 
 
 }
