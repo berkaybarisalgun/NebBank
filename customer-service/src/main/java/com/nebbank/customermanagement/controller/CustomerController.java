@@ -4,6 +4,7 @@ import com.nebbank.customermanagement.dto.CustomerDto;
 import com.nebbank.customermanagement.exceptions.CustomerCreationException;
 import com.nebbank.customermanagement.exceptions.CustomerNotFoundException;
 import com.nebbank.customermanagement.service.CustomerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping("/create")
-    public ResponseEntity createCustomer(@RequestBody CustomerDto customerDto) throws CustomerCreationException {
+    public ResponseEntity createCustomer(@Valid @RequestBody CustomerDto customerDto) throws CustomerCreationException {
 
         customerService.createCustomer(customerDto);
 
@@ -37,7 +38,7 @@ public class CustomerController {
 
 
     @PutMapping("/update")
-    public ResponseEntity updateCustomer(@RequestBody CustomerDto customerDto) throws CustomerNotFoundException {
+    public ResponseEntity updateCustomer( @RequestBody CustomerDto customerDto) throws CustomerNotFoundException {
         customerService.updateCustomer(customerDto);
         return ResponseEntity
                .status(HttpStatus.OK)

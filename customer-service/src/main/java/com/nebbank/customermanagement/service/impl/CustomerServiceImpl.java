@@ -23,7 +23,8 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
-    public void createCustomer(CustomerDto customerDto) throws CustomerCreationException {
+    public void createCustomer(CustomerDto customerDto){
+
         Customer customer = modelMapper.map(customerDto, Customer.class);
 
         checkCustomerExistence(customerDto.getMobileNumber(), "mobile number");

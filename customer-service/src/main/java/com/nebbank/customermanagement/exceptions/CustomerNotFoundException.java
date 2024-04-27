@@ -3,12 +3,9 @@ package com.nebbank.customermanagement.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.NOT_FOUND)
-public class CustomerNotFoundException extends Exception {
-
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class CustomerNotFoundException extends ApplicationException {
     public CustomerNotFoundException(String message) {
-        super(message);
+        super(message, HttpStatus.NOT_FOUND);
     }
-
-
 }
