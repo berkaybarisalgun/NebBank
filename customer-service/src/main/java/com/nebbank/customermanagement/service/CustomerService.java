@@ -12,7 +12,7 @@ public interface CustomerService {
 
     Boolean updateCustomer(CustomerDto customerDto) throws CustomerNotFoundException;
 
-    void deleteCustomerByAttribute(String attributeType, String attributeValue) throws CustomerNotFoundException;
+    Boolean deleteCustomerByAttribute(String attributeType, String attributeValue) throws CustomerNotFoundException;
 
 
 }
