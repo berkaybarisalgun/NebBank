@@ -4,7 +4,7 @@ import com.nebbank.customermanagement.dto.CustomerDto;
 import com.nebbank.customermanagement.entity.Customer;
 import com.nebbank.customermanagement.exceptions.CustomerCreationException;
 import com.nebbank.customermanagement.exceptions.CustomerNotFoundException;
-import com.nebbank.customermanagement.exceptions.IllegalArgumentException;
+import com.nebbank.customermanagement.exceptions.WrongArgumentException;
 import com.nebbank.customermanagement.repository.CustomerRepository;
 import com.nebbank.customermanagement.service.CustomerService;
 import jakarta.transaction.Transactional;
@@ -25,6 +25,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
+    @Transactional
     public void createCustomer(CustomerDto customerDto) {
         log.info("Attempting to create a new customer:{}", customerDto);
         Customer customer = modelMapper.map(customerDto, Customer.class);
@@ -63,7 +64,7 @@ public class CustomerServiceImpl implements CustomerService {
             Long id = Long.valueOf(attributeValue);
             customer = customerRepository.findById(id).orElseThrow(() -> new CustomerNotFoundException("Customer not found with given id:" + id));
         } else {
-            throw new IllegalArgumentException("Unknown attribute type: " + attributeType);
+            throw new WrongArgumentException("Unknown attribute type: " + attributeType);
         }
         log.info("Found customer with {} attribute,value:{}", attributeType, attributeValue);
         return modelMapper.map(customer, CustomerDto.class);
@@ -73,18 +74,18 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional
     public Boolean updateCustomer(CustomerDto customerDto) throws CustomerNotFoundException {
-
         boolean isUpdated = false;
 
-        Optional<Customer> customer = customerRepository.findByEmail(customerDto.getEmail());
-        log.info("Updating customer:{}", modelMapper.map(customer, CustomerDto.class));
-        if (customer.isPresent()) {
-            customer.get().setEmail(customerDto.getEmail());
-            customer.get().setMobileNumber(customerDto.getMobileNumber());
-            customer.get().setFirstName(customerDto.getFirstName());
-            customer.get().setLastName(customerDto.getLastName());
+        Optional<Customer> optionalCustomer = customerRepository.findByEmail(customerDto.getEmail());
+        if (optionalCustomer.isPresent()) {
+            Customer customer = optionalCustomer.get();
+            customer.setEmail(customerDto.getEmail());
+            customer.setMobileNumber(customerDto.getMobileNumber());
+            customer.setFirstName(customerDto.getFirstName());
+            customer.setLastName(customerDto.getLastName());
+            customer.setDateOfBirth(customerDto.getDateOfBirth());
             log.info("Customer updated to {}", customerDto);
-            customerRepository.save(customer.get());
+            customerRepository.save(customer);
             isUpdated = true;
         } else {
             log.error("Customer Not Found to update:{}", customerDto);
@@ -92,35 +93,40 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         return isUpdated;
-
     }
+
 
     @Override
     public Boolean deleteCustomerByAttribute(String attributeType, String attributeValue) throws CustomerNotFoundException {
         Boolean isDeleted = false;
         log.info("Deleting customer with {} attribute,value:{}", attributeType, attributeValue);
+
+        Customer customer = null;
         if ("email".equalsIgnoreCase(attributeType)) {
-            Customer customer = customerRepository.findByEmail(attributeValue)
+            customer = customerRepository.findByEmail(attributeValue)
                     .orElseThrow(() -> new CustomerNotFoundException("Customer with email " + attributeValue + " not found"));
-            customerRepository.delete(customer);
-            isDeleted = true;
+
         } else if ("phone".equalsIgnoreCase(attributeType)) {
-            Customer customer = customerRepository.findByMobileNumber(attributeValue)
+            customer = customerRepository.findByMobileNumber(attributeValue)
                     .orElseThrow(() -> new CustomerNotFoundException("Customer with phone " + attributeValue + " not found"));
-            customerRepository.delete(customer);
-            isDeleted = true;
         } else if ("id".equalsIgnoreCase(attributeType)) {
             Long id = Long.valueOf(attributeValue);
-            Customer customer = customerRepository.findById(id)
+            customer = customerRepository.findById(id)
                     .orElseThrow(() -> new CustomerNotFoundException("Customer with id " + attributeValue + " not found"));
-            customerRepository.delete(customer);
-            isDeleted = true;
         } else {
-            throw new IllegalArgumentException("Unknown attribute type: " + attributeType);
+            throw new WrongArgumentException("Unknown attribute type: " + attributeType);
         }
-        log.info("Deleted customer with {} attribute,value:{}", attributeType, attributeValue);
+        customerRepository.delete(customer);
+        isDeleted = !customerRepository.existsById(customer.getId());
+        if(isDeleted) {
+            log.info("Deleted customer with {} attribute,value:{}", attributeType, attributeValue);
+        } else {
+            log.info("Failed to delete customer with {} attribute,value:{}", attributeType, attributeValue);
+        }
         return isDeleted;
     }
+
+
 
 
 }
