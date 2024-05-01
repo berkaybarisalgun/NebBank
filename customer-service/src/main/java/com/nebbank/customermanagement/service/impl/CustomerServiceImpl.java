@@ -64,7 +64,7 @@ public class CustomerServiceImpl implements CustomerService {
             Long id = Long.valueOf(attributeValue);
             customer = customerRepository.findById(id).orElseThrow(() -> new CustomerNotFoundException("Customer not found with given id:" + id));
         } else {
-            throw new WrongArgumentException("Unknown attribute type: " + attributeType);
+            throw new WrongArgumentException("Attempted to access customer with unsupported attribute type: " + attributeType);
         }
         log.info("Found customer with {} attribute,value:{}", attributeType, attributeValue);
         return modelMapper.map(customer, CustomerDto.class);
@@ -97,6 +97,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
+    @Transactional
     public Boolean deleteCustomerByAttribute(String attributeType, String attributeValue) throws CustomerNotFoundException {
         Boolean isDeleted = false;
         log.info("Deleting customer with {} attribute,value:{}", attributeType, attributeValue);
@@ -114,7 +115,7 @@ public class CustomerServiceImpl implements CustomerService {
             customer = customerRepository.findById(id)
                     .orElseThrow(() -> new CustomerNotFoundException("Customer with id " + attributeValue + " not found"));
         } else {
-            throw new WrongArgumentException("Unknown attribute type: " + attributeType);
+            throw new WrongArgumentException("Attempted to access customer with unsupported attribute type: " + attributeType);
         }
         customerRepository.delete(customer);
         isDeleted = !customerRepository.existsById(customer.getId());
