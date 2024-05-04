@@ -3,6 +3,7 @@ package com.nebbank.customermanagement.controller;
 import com.nebbank.customermanagement.dto.CustomerDto;
 import com.nebbank.customermanagement.exceptions.CustomerCreationException;
 import com.nebbank.customermanagement.exceptions.CustomerNotFoundException;
+import com.nebbank.customermanagement.exceptions.NoCustomerToListException;
 import com.nebbank.customermanagement.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(
         name="CRUD REST APIs for Customers in NebBank",
@@ -93,6 +96,38 @@ public class CustomerController {
             CustomerDto customer = customerService.findCustomerByAttribute(attributeType, attributeValue);
             return ResponseEntity.status(HttpStatus.OK).body(customer);
         } catch (CustomerNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @Operation(
+            summary = "Fetch All Customers Details REST API",
+            description = "Rest API to fetch all customer details"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTTP Status OK",
+                    content = @Content(
+                            schema = @Schema(implementation = CustomerDto.class)
+                    )
+
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "HTTP Status Not Found",
+                    content = @Content(
+                            schema = @Schema(implementation = NoCustomerToListException.class)
+                    )
+
+            )
+    })
+    @GetMapping("/fetchall")
+    public ResponseEntity<?> fetchAllCustomers(){
+        try{
+            List<CustomerDto> customers=customerService.findAllCustomers();
+            return ResponseEntity.status(HttpStatus.OK).body(customers);
+        }catch (NoCustomerToListException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }

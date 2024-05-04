@@ -2,18 +2,20 @@ package com.nebbank.customermanagement.service.impl;
 
 import com.nebbank.customermanagement.dto.CustomerDto;
 import com.nebbank.customermanagement.entity.Customer;
-import com.nebbank.customermanagement.exceptions.CustomerCreationException;
-import com.nebbank.customermanagement.exceptions.CustomerNotFoundException;
-import com.nebbank.customermanagement.exceptions.WrongArgumentException;
+import com.nebbank.customermanagement.exceptions.*;
 import com.nebbank.customermanagement.repository.CustomerRepository;
 import com.nebbank.customermanagement.service.CustomerService;
+import com.nebbank.customermanagement.util.RandomNumberGenerator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -29,6 +31,8 @@ public class CustomerServiceImpl implements CustomerService {
     public void createCustomer(CustomerDto customerDto) {
         log.info("Attempting to create a new customer:{}", customerDto);
         Customer customer = modelMapper.map(customerDto, Customer.class);
+        customer.setIsDeleted(false);
+        customer.setId(RandomNumberGenerator.generateSevenDigitNumber());
 
         checkCustomerExistence(customerDto.getMobileNumber(), "mobile number");
         checkCustomerExistence(customerDto.getEmail(), "email");
@@ -66,9 +70,28 @@ public class CustomerServiceImpl implements CustomerService {
         } else {
             throw new WrongArgumentException("Attempted to access customer with unsupported attribute type: " + attributeType);
         }
+        if(customer.getIsDeleted()==true){
+            log.error("Tried to access deleted user:{}",attributeValue);
+            throw new DeletedUserException("Attempted to access customer that is deleted: " + attributeValue);
+        }
+
         log.info("Found customer with {} attribute,value:{}", attributeType, attributeValue);
         return modelMapper.map(customer, CustomerDto.class);
     }
+
+    @Override
+    public List<CustomerDto> findAllCustomers() throws NoCustomerToListException {
+        List<Customer> customers = customerRepository.findAll();
+        log.info("Number of customers found {}",customers.size());
+        if (customers.isEmpty()) {
+            log.error("No customers to list");
+            throw new NoCustomerToListException("No customer to list",HttpStatus.NOT_FOUND);
+        }
+        return customers.stream()
+                .map(customer -> modelMapper.map(customer, CustomerDto.class))
+                .collect(Collectors.toList());
+    }
+
 
 
     @Override
@@ -99,14 +122,12 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional
     public Boolean deleteCustomerByAttribute(String attributeType, String attributeValue) throws CustomerNotFoundException {
-        Boolean isDeleted = false;
         log.info("Deleting customer with {} attribute,value:{}", attributeType, attributeValue);
 
-        Customer customer = null;
+        Customer customer;
         if ("email".equalsIgnoreCase(attributeType)) {
             customer = customerRepository.findByEmail(attributeValue)
                     .orElseThrow(() -> new CustomerNotFoundException("Customer with email " + attributeValue + " not found"));
-
         } else if ("phone".equalsIgnoreCase(attributeType)) {
             customer = customerRepository.findByMobileNumber(attributeValue)
                     .orElseThrow(() -> new CustomerNotFoundException("Customer with phone " + attributeValue + " not found"));
@@ -117,15 +138,14 @@ public class CustomerServiceImpl implements CustomerService {
         } else {
             throw new WrongArgumentException("Attempted to access customer with unsupported attribute type: " + attributeType);
         }
-        customerRepository.delete(customer);
-        isDeleted = !customerRepository.existsById(customer.getId());
-        if(isDeleted) {
-            log.info("Deleted customer with {} attribute,value:{}", attributeType, attributeValue);
-        } else {
-            log.info("Failed to delete customer with {} attribute,value:{}", attributeType, attributeValue);
-        }
-        return isDeleted;
+
+        customer.setIsDeleted(true);
+        customerRepository.save(customer); // Save the changes to the database
+
+        log.info("Successfully marked as deleted customer with {} attribute,value:{}", attributeType, attributeValue);
+        return true;
     }
+
 
 
 
