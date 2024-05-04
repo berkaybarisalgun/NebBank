@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import com.nebbank.customermanagement.exceptions.CustomerCreationException;
+
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -47,12 +49,28 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+    @ExceptionHandler(WrongArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgumentException(WrongArgumentException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler(NoCustomerToListException.class)
+    public ResponseEntity<Object> noCustomerToListException(NoCustomerToListException ex){
+        Map<String,Object> body=new LinkedHashMap<>();
+        body.put("timestamp",LocalDateTime.now());
+        body.put("message",ex.getMessage());
+        return new ResponseEntity<>(body,HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DeletedUserException.class)
+    public ResponseEntity<Object> noCustomerToListException(DeletedUserException ex){
+        Map<String,Object> body=new LinkedHashMap<>();
+        body.put("timestamp",LocalDateTime.now());
+        body.put("message",ex.getMessage());
+        return new ResponseEntity<>(body,HttpStatus.NOT_FOUND);
     }
 
 }
