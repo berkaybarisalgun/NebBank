@@ -10,7 +10,6 @@ import org.modelmapper.internal.bytebuddy.dynamic.loading.InjectionClassLoader;
 public class Customer extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id")
     private Long Id;
 
