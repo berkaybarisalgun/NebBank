@@ -141,7 +141,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         customer.setIsDeleted(true);
-        customerRepository.save(customer); // Save the changes to the database
+        customerRepository.save(customer);
 
         log.info("Successfully marked as deleted customer with {} attribute,value:{}", attributeType, attributeValue);
         return true;
