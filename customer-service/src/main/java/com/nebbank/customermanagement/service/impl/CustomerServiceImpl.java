@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -83,7 +84,7 @@ public class CustomerServiceImpl implements CustomerService {
     public List<CustomerDto> findAllCustomers() throws NoCustomerToListException {
         List<Customer> customers = customerRepository.findAll();
         log.info("Number of customers found {}",customers.size());
-        if (customers.isEmpty()) {
+        if (CollectionUtils.isEmpty(customers)) {
             log.error("No customers to list");
             throw new NoCustomerToListException("No customer to list",HttpStatus.NOT_FOUND);
         }
