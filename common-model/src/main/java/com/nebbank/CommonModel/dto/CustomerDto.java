@@ -16,7 +16,7 @@ public class CustomerDto {
 
     @Schema(
             description ="Name of the customer",example = "Baris"
-    ) 
+    )
     @NotEmpty(message = "Name cannot be null or empty")
     @Size(min=2,max = 30,message = "The length of the customer name should be between 2 and 30")
     private String firstName;

@@ -58,7 +58,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto findCustomerByAttribute(String attributeType, String attributeValue) throws CustomerNotFoundException {
-        System.out.println("selam");
         Customer customer = null;
         log.info("Find customer with {} attribute,value:{}", attributeType, attributeValue);
 

@@ -6,12 +6,15 @@ import com.nebbank.customermanagement.exceptions.CustomerNotFoundException;
 import com.nebbank.customermanagement.exceptions.NoCustomerToListException;
 import com.nebbank.customermanagement.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Tag(
-        name="CRUD REST APIs for Customers in NebBank",
+        name = "CRUD REST APIs for Customers in NebBank",
         description = "CRUD REST APIs in NebBank to CREATE,UPDATE,FETCH and DELETE customer details"
 )
 @RestController
@@ -68,22 +71,6 @@ public class CustomerController {
         }
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<?> fetchCustomerByAttributes(@RequestParam String attributeType) {
-        //return ResponseEntity.status(HttpStatus.NOT_FOUND).body("sl");
-
-        try {
-            CustomerDto customer = customerService.findCustomerByAttribute("email", "ecem@gunay.com");
-            return ResponseEntity.status(HttpStatus.OK).body(customer);
-        } catch (CustomerNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-
-        //return ResponseEntity.status(HttpStatus.CONFLICT).body("howww");
-
-
-    }
-
     @Operation(
             summary = "Fetch Customer Details REST API",
             description = "Rest API to fetch customer details"
@@ -107,9 +94,18 @@ public class CustomerController {
             )
     })
     @GetMapping("/fetch")
-    public ResponseEntity<?> fetchCustomerByAttribute(@RequestParam(name = "attributeType") String type, @RequestParam(name = "attributeValue") String value) {
+    public ResponseEntity<?> fetchCustomerByAttribute(
+            @Parameter(
+                    in = ParameterIn.QUERY,
+                    description = "Type of the attribute to search by",
+                    required = true,
+                    schema = @Schema(allowableValues = {"phone", "email", "id"})
+            )
+            @RequestParam(name = "attributeType") String attributeType,
+            @RequestParam(name = "attributeValue") @NotBlank String attributeValue) {
+
         try {
-            CustomerDto customer = customerService.findCustomerByAttribute(type, value);
+            CustomerDto customer = customerService.findCustomerByAttribute(attributeType, attributeValue);
             return ResponseEntity.status(HttpStatus.OK).body(customer);
         } catch (CustomerNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -139,11 +135,11 @@ public class CustomerController {
             )
     })
     @GetMapping("/fetchall")
-    public ResponseEntity<?> fetchAllCustomers(){
-        try{
-            List<CustomerDto> customers=customerService.findAllCustomers();
+    public ResponseEntity<?> fetchAllCustomers() {
+        try {
+            List<CustomerDto> customers = customerService.findAllCustomers();
             return ResponseEntity.status(HttpStatus.OK).body(customers);
-        }catch (NoCustomerToListException e){
+        } catch (NoCustomerToListException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
@@ -189,8 +185,8 @@ public class CustomerController {
                     responseCode = "200",
                     description = "HTTP Status OK",
                     content = @Content(
-                    schema = @Schema(implementation = String.class)
-            )
+                            schema = @Schema(implementation = String.class)
+                    )
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -204,7 +200,15 @@ public class CustomerController {
     )
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteCustomerByAttribute(@RequestParam String attributeType, @RequestParam String attributeValue) {
+    public ResponseEntity<?> deleteCustomerByAttribute(
+            @Parameter(
+                    in = ParameterIn.QUERY,
+                    description = "Type of the attribute to delete by",
+                    required = true,
+                    schema = @Schema(allowableValues = {"phone", "email", "id"})
+            )
+            @RequestParam(name = "attributeType") String attributeType,
+            @RequestParam(name = "attributeValue") @NotBlank String attributeValue) {
         try {
             customerService.deleteCustomerByAttribute(attributeType, attributeValue);
             return ResponseEntity.status(HttpStatus.OK).body("deleted successfully");
@@ -212,5 +216,4 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-
 }
