@@ -1,6 +1,6 @@
 package com.nebbank.customermanagement.service;
 
-import com.nebbank.customermanagement.dto.CustomerDto;
+import com.nebbank.CommonModel.dto.CustomerDto;
 import com.nebbank.customermanagement.exceptions.CustomerCreationException;
 import com.nebbank.customermanagement.exceptions.CustomerNotFoundException;
 import com.nebbank.customermanagement.exceptions.NoCustomerToListException;

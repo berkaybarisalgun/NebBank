@@ -1,6 +1,6 @@
 package com.nebbank.customermanagement.controller;
 
-import com.nebbank.customermanagement.dto.CustomerDto;
+import com.nebbank.CommonModel.dto.CustomerDto;
 import com.nebbank.customermanagement.exceptions.CustomerCreationException;
 import com.nebbank.customermanagement.exceptions.CustomerNotFoundException;
 import com.nebbank.customermanagement.exceptions.NoCustomerToListException;
@@ -68,6 +68,22 @@ public class CustomerController {
         }
     }
 
+    @GetMapping("/get")
+    public ResponseEntity<?> fetchCustomerByAttributes(@RequestParam String attributeType) {
+        //return ResponseEntity.status(HttpStatus.NOT_FOUND).body("sl");
+
+        try {
+            CustomerDto customer = customerService.findCustomerByAttribute("email", "ecem@gunay.com");
+            return ResponseEntity.status(HttpStatus.OK).body(customer);
+        } catch (CustomerNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+
+        //return ResponseEntity.status(HttpStatus.CONFLICT).body("howww");
+
+
+    }
+
     @Operation(
             summary = "Fetch Customer Details REST API",
             description = "Rest API to fetch customer details"
@@ -91,9 +107,9 @@ public class CustomerController {
             )
     })
     @GetMapping("/fetch")
-    public ResponseEntity<?> fetchCustomerByAttribute(@RequestParam String attributeType, @RequestParam String attributeValue) {
+    public ResponseEntity<?> fetchCustomerByAttribute(@RequestParam(name = "attributeType") String type, @RequestParam(name = "attributeValue") String value) {
         try {
-            CustomerDto customer = customerService.findCustomerByAttribute(attributeType, attributeValue);
+            CustomerDto customer = customerService.findCustomerByAttribute(type, value);
             return ResponseEntity.status(HttpStatus.OK).body(customer);
         } catch (CustomerNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

@@ -1,6 +1,6 @@
 package com.nebbank.customermanagement.repository;
 
-import com.nebbank.customermanagement.entity.Customer;
+import com.nebbank.common.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

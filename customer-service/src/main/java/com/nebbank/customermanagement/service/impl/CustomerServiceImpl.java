@@ -1,7 +1,7 @@
 package com.nebbank.customermanagement.service.impl;
 
-import com.nebbank.customermanagement.dto.CustomerDto;
-import com.nebbank.customermanagement.entity.Customer;
+import com.nebbank.CommonModel.dto.CustomerDto;
+import com.nebbank.common.entity.Customer;
 import com.nebbank.customermanagement.exceptions.*;
 import com.nebbank.customermanagement.repository.CustomerRepository;
 import com.nebbank.customermanagement.service.CustomerService;
@@ -58,6 +58,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto findCustomerByAttribute(String attributeType, String attributeValue) throws CustomerNotFoundException {
+        System.out.println("selam");
         Customer customer = null;
         log.info("Find customer with {} attribute,value:{}", attributeType, attributeValue);
 

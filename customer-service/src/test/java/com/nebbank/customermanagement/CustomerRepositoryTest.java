@@ -1,6 +1,6 @@
 package com.nebbank.customermanagement;
 
-import com.nebbank.customermanagement.entity.Customer;
+import com.nebbank.common.entity.Customer;
 import com.nebbank.customermanagement.repository.CustomerRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
