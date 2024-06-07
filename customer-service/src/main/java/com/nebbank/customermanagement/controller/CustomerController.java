@@ -199,21 +199,17 @@ public class CustomerController {
     }
     )
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteCustomerByAttribute(
-            @Parameter(
-                    in = ParameterIn.QUERY,
-                    description = "Type of the attribute to delete by",
-                    required = true,
-                    schema = @Schema(allowableValues = {"phone", "email", "id"})
-            )
-            @RequestParam(name = "attributeType") String attributeType,
-            @RequestParam(name = "attributeValue") @NotBlank String attributeValue) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteCustomerById(@PathVariable Long id) {
         try {
-            customerService.deleteCustomerByAttribute(attributeType, attributeValue);
-            return ResponseEntity.status(HttpStatus.OK).body("deleted successfully");
+            customerService.deleteCustomerById(id);
+            return ResponseEntity.ok("Customer deleted successfully");
         } catch (CustomerNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
         }
     }
+
+
 }

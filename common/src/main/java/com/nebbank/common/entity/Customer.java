@@ -15,7 +15,7 @@ public class Customer extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id; // Sütun adı 'id' olarak değiştirildi
+    private Long id;
 
     @Column(name = "first_name")
     private String firstName;

@@ -120,32 +120,17 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
 
-    @Override
-    @Transactional
-    public Boolean deleteCustomerByAttribute(String attributeType, String attributeValue) throws CustomerNotFoundException {
-        log.info("Deleting customer with {} attribute,value:{}", attributeType, attributeValue);
-
-        Customer customer;
-        if ("email".equalsIgnoreCase(attributeType)) {
-            customer = customerRepository.findByEmail(attributeValue)
-                    .orElseThrow(() -> new CustomerNotFoundException("Customer with email " + attributeValue + " not found"));
-        } else if ("phone".equalsIgnoreCase(attributeType)) {
-            customer = customerRepository.findByMobileNumber(attributeValue)
-                    .orElseThrow(() -> new CustomerNotFoundException("Customer with phone " + attributeValue + " not found"));
-        } else if ("id".equalsIgnoreCase(attributeType)) {
-            Long id = Long.valueOf(attributeValue);
-            customer = customerRepository.findById(id)
-                    .orElseThrow(() -> new CustomerNotFoundException("Customer with id " + attributeValue + " not found"));
-        } else {
-            throw new WrongArgumentException("Attempted to access customer with unsupported attribute type: " + attributeType);
+    public Boolean deleteCustomerById(Long id) {
+        try {
+            Customer customer = customerRepository.findById(id)
+                    .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+            customerRepository.delete(customer);
+            return true;
+        } catch (CustomerNotFoundException e) {
+            return false;
         }
-
-        customer.setIsDeleted(true);
-        customerRepository.save(customer);
-
-        log.info("Successfully marked as deleted customer with {} attribute,value:{}", attributeType, attributeValue);
-        return true;
     }
+
 
 
 
